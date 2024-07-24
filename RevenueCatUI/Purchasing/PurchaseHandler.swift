@@ -527,6 +527,19 @@ extension EnvironmentValues {
     }
 }
 
+/// `EnvironmentKey` for storing if the currenct action is in progress
+struct IsPurchaseActionInProgressKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
+extension EnvironmentValues {
+    var isPurchaseActionInProgress: Bool {
+        get { self[IsPurchaseActionInProgressKey.self] }
+        set { self[IsPurchaseActionInProgressKey.self] = newValue }
+    }
+}
+
+
 // MARK: -
 
 private extension CustomerInfo {
