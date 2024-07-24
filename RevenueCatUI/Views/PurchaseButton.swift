@@ -29,6 +29,8 @@ struct PurchaseButton: View {
     private var purchaseHandler: PurchaseHandler
     @Environment(\.isEnabled)
     private var isEnabled
+    @Environment(\.isPurchaseActionInProgress)
+    private var isPurchaseActionInProgress
 
     init(
         packages: TemplateViewConfiguration.PackageConfiguration,
@@ -101,9 +103,9 @@ struct PurchaseButton: View {
             #if !os(watchOS)
             .padding()
             #endif
-            .hidden(if: !self.isEnabled)
+            .hidden(if: isPurchaseActionInProgress)
             .overlay {
-                if !self.isEnabled {
+                if isPurchaseActionInProgress {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .tint(self.colors.callToActionForegroundColor)
@@ -120,6 +122,7 @@ struct PurchaseButton: View {
                 transaction.animation = nil
             }
         }
+        .disabled(self.selectedPackage.currentlySubscribed)
         #if targetEnvironment(macCatalyst)
         .buttonStyle(.plain)
         #endif
@@ -132,6 +135,10 @@ struct PurchaseButton: View {
     }
 
     private var backgroundColor: some ShapeStyle {
+        let disabled = self.colors.callToActionDisabledBackgroundColor
+        guard !self.selectedPackage.currentlySubscribed else {
+            return AnyShapeStyle(disabled)
+        }
         let primary = self.colors.callToActionBackgroundColor
 
         if let secondary = self.colors.callToActionSecondaryBackgroundColor {
