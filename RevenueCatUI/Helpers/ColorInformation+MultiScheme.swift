@@ -145,6 +145,9 @@ extension PaywallData.Configuration.Colors {
         self.callToActionForeground?.underlyingColor ?? Self.defaultForegroundColor
     }
     var callToActionSecondaryBackgroundColor: Color? { self.callToActionSecondaryBackground?.underlyingColor }
+    var callToActionDisabledBackgroundColor: Color {
+        self.callToActionDisabledBackground?.underlyingColor ?? Self.defaultDisabledBackgroundColor
+    }
     var accent1Color: Color { self.accent1?.underlyingColor ?? self.callToActionForegroundColor }
     var accent2Color: Color { self.accent2?.underlyingColor ?? self.accent1Color }
     var accent3Color: Color { self.accent3?.underlyingColor ?? self.accent2Color }
@@ -163,7 +166,7 @@ extension PaywallData.Configuration.Colors {
     #endif
 
     private static let defaultForegroundColor: Color = .primary
-
+    private static let defaultDisabledBackgroundColor: Color = .gray
 }
 
 #endif
