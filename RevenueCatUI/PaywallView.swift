@@ -472,7 +472,7 @@ struct LoadedOfferingPaywallView: View {
                         introEligibility: self.introEligibility)
             .environmentObject(self.introEligibility)
             .environmentObject(self.purchaseHandler)
-            .disabled(self.purchaseHandler.actionInProgress)
+            .isPurchaseActionInProgress(self.purchaseHandler.actionInProgress)
             .onAppear { self.purchaseHandler.trackPaywallImpression(self.createEventData()) }
             .onDisappear { self.purchaseHandler.trackPaywallClose() }
             .onChangeOf(self.purchaseHandler.purchased) { purchased in
@@ -535,7 +535,7 @@ struct LoadedOfferingPaywallView: View {
                 Image(systemName: "xmark")
                     .foregroundColor(color)
             }
-            .disabled(self.purchaseHandler.actionInProgress)
+            .isPurchaseActionInProgress(self.purchaseHandler.actionInProgress)
             .opacity(
                 self.purchaseHandler.actionInProgress
                 ? Constants.purchaseInProgressButtonOpacity
