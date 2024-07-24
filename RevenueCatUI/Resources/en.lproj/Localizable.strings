@@ -29,3 +29,4 @@
 "Dismiss" = "Dismiss";
 "We couldn’t find any additional purchases under this account. \n\nContact support for assistance if you think this is an error." = "We couldn’t find any additional purchases under this account. \n\nContact support for assistance if you think this is an error.";
 "then_price_per_period" = "then %@";
+"(Current Plan)" = "(Current Plan);"
