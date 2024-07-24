@@ -433,6 +433,12 @@ struct Template7View: TemplateViewType {
                 .foregroundColor(color)
 
             Text(package.localization.offerName ?? package.content.productName)
+            
+            if package.currentlySubscribed {
+                Text("(Current Plan)", bundle: .module)
+                    .foregroundStyle(self.currentColors.selectedTier)
+                    .font(self.font(for: .caption))
+            }
         }
     }
 
