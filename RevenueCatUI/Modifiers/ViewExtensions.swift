@@ -109,19 +109,20 @@ extension View {
     @ViewBuilder
     func scrollableIfNecessaryWhenAvailable(_ axis: Axis = .vertical, enabled: Bool = true) -> some View {
         if enabled {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                ViewThatFits(in: axis.scrollViewAxis) {
-                    self
+//TODO: Temp fix because of issue(4150)
+//            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+//                ViewThatFits(in: axis.scrollViewAxis) {
+//                    self
 
-                    ScrollView(axis.scrollViewAxis) {
-                        self
-                    }
-                }
-            } else {
+//                    ScrollView(axis.scrollViewAxis) {
+//                        self
+//                    }
+//                }
+//            } else {
                 self
                     .centeredContent(axis)
                     .scrollable(if: enabled)
-            }
+//            }
         } else {
             self
         }
