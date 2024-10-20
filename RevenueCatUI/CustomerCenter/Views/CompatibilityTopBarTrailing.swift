@@ -11,15 +11,15 @@
 //
 //  Created by Josh Holtz on 8/16/24.
 
-#if CUSTOMER_CENTER_ENABLED
-
 import SwiftUI
+
+#if os(iOS)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 internal extension ToolbarItemPlacement {
 
     static var compatibleTopBarTrailing: ToolbarItemPlacement {
-        #if swift(>=5.9)
+        #if swift(>=5.9) && !os(macOS)
             if #available(iOS 14.0, tvOS 14.0, watchOS 10.0, *) {
                 return .topBarTrailing
             } else {

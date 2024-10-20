@@ -13,11 +13,9 @@
 //  Created by Cesar de la Vega on 28/5/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import Foundation
 
-// swiftlint:disable missing_docs nesting file_length
+// swiftlint:disable missing_docs nesting file_length type_body_length
 public typealias RCColor = PaywallColor
 
 public struct CustomerCenterConfigData {
@@ -27,17 +25,20 @@ public struct CustomerCenterConfigData {
     public let localization: Localization
     public let support: Support
     public let lastPublishedAppVersion: String?
+    public let productId: UInt?
 
     public init(screens: [Screen.ScreenType: Screen],
                 appearance: Appearance,
                 localization: Localization,
                 support: Support,
-                lastPublishedAppVersion: String?) {
+                lastPublishedAppVersion: String?,
+                productId: UInt?) {
         self.screens = screens
         self.appearance = appearance
         self.localization = localization
         self.support = support
         self.lastPublishedAppVersion = lastPublishedAppVersion
+        self.productId = productId
     }
 
     public struct Localization {
@@ -73,6 +74,20 @@ public struct CustomerCenterConfigData {
             case defaultBody = "default_body"
             case defaultSubject = "default_subject"
             case dismiss = "dismiss"
+            case updateWarningTitle = "update_warning_title"
+            case updateWarningDescription = "update_warning_description"
+            case updateWarningUpdate = "update_warning_update"
+            case updateWarningIgnore = "update_warning_ignore"
+            case pleaseContactSupportToManage = "please_contact_support"
+            case appleSubscriptionManage = "apple_subscription_manage"
+            case googleSubscriptionManage = "google_subscription_manage"
+            case amazonSubscriptionManage = "amazon_subscription_manage"
+            case platformMismatch = "platform_mismatch"
+            case goingToCheckPurchases = "going_to_check_purchases"
+            case checkPastPurchases = "check_past_purchases"
+            case purchasesRecovered = "purchases_recovered"
+            case purchasesRecoveredExplanation = "purchases_recovered_explanation"
+            case purchasesNotRecovered = "purchases_not_recovered"
 
             var defaultValue: String {
                 switch self {
@@ -84,6 +99,17 @@ public struct CustomerCenterConfigData {
                     return "We can try checking your Apple account for any previous purchases"
                 case .restorePurchases:
                     return "Restore purchases"
+                case .goingToCheckPurchases:
+                    return "Let’s take a look! We’re going to check your account for missing purchases."
+                case .checkPastPurchases:
+                    return "Check past purchases"
+                case .purchasesRecovered:
+                    return "Purchases recovered!"
+                case .purchasesRecoveredExplanation:
+                    return "We applied the previously purchased items to your account. Sorry for the inconvenience."
+                case .purchasesNotRecovered:
+                    return "We couldn't find any additional purchases under this account. " +
+                    "Contact support for assistance if you think this is an error."
                 case .cancel:
                     return "Cancel"
                 case .billingCycle:
@@ -118,6 +144,24 @@ public struct CustomerCenterConfigData {
                     return "Support Request"
                 case .dismiss:
                     return "Dismiss"
+                case .updateWarningTitle:
+                    return "Update available"
+                case .updateWarningDescription:
+                    return "Downloading the latest version of the app may help solve the problem."
+                case .updateWarningUpdate:
+                    return "Update"
+                case .updateWarningIgnore:
+                    return "Continue"
+                case .platformMismatch:
+                    return "Platform mismatch"
+                case .pleaseContactSupportToManage:
+                    return "Please contact support to manage your subscription."
+                case .appleSubscriptionManage:
+                    return "You can manage your subscription by using the App Store app on an Apple device."
+                case .googleSubscriptionManage:
+                    return "You can manage your subscription by using the Play Store app on an Android device"
+                case .amazonSubscriptionManage:
+                    return "You can manage your subscription in the Amazon Appstore app on an Amazon device."
                 }
             }
 
@@ -333,6 +377,7 @@ extension CustomerCenterConfigData {
         })
         self.support = Support(from: response.customerCenter.support)
         self.lastPublishedAppVersion = response.lastPublishedAppVersion
+        self.productId = response.itunesTrackId
     }
 
 }
@@ -437,5 +482,3 @@ extension CustomerCenterConfigData.Support {
     }
 
 }
-
-#endif

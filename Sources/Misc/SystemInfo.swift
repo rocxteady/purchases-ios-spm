@@ -75,7 +75,7 @@ class SystemInfo {
     }
 
     static var frameworkVersion: String {
-        return "5.3.0-SNAPSHOT"
+        return "5.6.0-SNAPSHOT"
     }
 
     static var systemVersion: String {
@@ -96,6 +96,19 @@ class SystemInfo {
 
     static var platformHeader: String {
         return Self.forceUniversalAppStore ? "iOS" : self.platformHeaderConstant
+    }
+
+    static var deviceVersion: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+
+        return identifier
     }
 
     var identifierForVendor: String? {
@@ -151,6 +164,10 @@ class SystemInfo {
         self.dangerousSettings = dangerousSettings ?? DangerousSettings()
         self.clock = clock
         self.preferredLocalesProvider = preferredLocalesProvider
+    }
+
+    var supportsOfflineEntitlements: Bool {
+        !self.observerMode && !self.dangerousSettings.customEntitlementComputation
     }
 
     /// Asynchronous API if caller can't ensure that it's invoked in the `@MainActor`

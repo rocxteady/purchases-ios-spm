@@ -8,20 +8,20 @@
 import Foundation
 import RevenueCat
 
-#if CUSTOMER_CENTER_ENABLED
-
 func checkCustomerCenterConfigData(_ data: CustomerCenterConfigData) {
     let screens: [CustomerCenterConfigData.Screen.ScreenType: CustomerCenterConfigData.Screen] = data.screens
     let appearance: CustomerCenterConfigData.Appearance = data.appearance
     let localization: CustomerCenterConfigData.Localization = data.localization
     let support: CustomerCenterConfigData.Support = data.support
     let lastPublishedAppVersion = data.lastPublishedAppVersion
+    let productId = data.productId
 
     let _: CustomerCenterConfigData = .init(screens: screens,
                                             appearance: appearance,
                                             localization: localization,
                                             support: support,
-                                            lastPublishedAppVersion: lastPublishedAppVersion)
+                                            lastPublishedAppVersion: lastPublishedAppVersion,
+                                            productId: productId)
 }
 
 func checkHelpPath(_ path: CustomerCenterConfigData.HelpPath) {
@@ -99,5 +99,3 @@ func checkPathType(_ type: CustomerCenterConfigData.HelpPath.PathType) {
         break
     }
 }
-
-#endif

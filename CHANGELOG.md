@@ -1,3 +1,254 @@
+## 5.5.0
+## 🫂 Customer Center Beta 🫂
+
+This release adds public beta support for the new Customer Center on iOS 15.0+.
+
+This central hub is a self-service section that can be added to your app to help your users manage their subscriptions on their own, reducing the support burden on developers 
+like you so you can spend more time building apps and less time dealing with support issues. We are hoping adding this new section to your app can help you reduce customer support 
+interactions, obtain feedback from your users and ultimately reduce churn by retaining them as subscribers, helping you make more money.
+
+See our [Customer Center documentation](https://www.revenuecat.com/docs/tools/customer-center) for more information.
+
+### Features currently available
+* Users can cancel current subscriptions
+* Users can ask for refunds
+* Users can change their subscription plans
+* Users can restore previous purchases and contact your support email if they have trouble restoring
+* Users will be asked to update their app if they are on an older version before being able to contact your support email
+* Developers can ask for reasons for cancellations or refunds, and automatically offer promo offers to retain users
+* Configuration is done in the RevenueCat dashboard, and advanced configuration is available via JSON
+
+### Limitations
+* Only available on iOS 15+
+* Limited visual configuration options in the dashboard. It is possible to configure the Customer Center via JSON.
+* We are exposing a SwiftUI view and a modifier at the moment. We haven't built a UIKit wrapper to help integrating on UIKit apps, but it's in the roadmap.
+
+### How to enable
+You can use the CustomerCenterView view directly:
+
+```swift
+var body: some View {
+    Group {
+        NavigationStack {
+            HomeView()
+                .navigationTitle("Home")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                        } label: {
+                            Image(systemName: "line.3.horizontal")
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            self.isCustomerCenterPresented = true
+                        } label: {
+                            Image(systemName: "person.crop.circle")
+                        }
+                    }
+                }
+        }
+    }
+    .foregroundColor(.white)
+    .sheet(isPresented: $isCustomerCenterPresented) {
+        CustomerCenterView()
+    }
+}
+```
+
+Or you can use the modifier:
+
+```swift
+VStack {
+    Button {
+        self.presentingCustomerCenter = true
+    } label: {
+        TemplateLabel(name: "Customer Center", icon: "person.fill")
+    }
+}
+.presentCustomerCenter(isPresented: self.$presentingCustomerCenter) {
+    self.presentingCustomerCenter = false
+}
+```
+
+### Listening to events
+
+You can listen to events in the Customer Center using the `customerCenterActionHandler` closure:
+
+```swift
+CustomerCenterView { customerCenterAction in
+    switch customerCenterAction {
+    case .restoreStarted:
+    case .restoreFailed(_):
+    case .restoreCompleted(_):
+    case .showingManageSubscriptions:
+    case .refundRequestStarted(_):
+    case .refundRequestCompleted(_):
+    }
+}
+```
+
+or if using the modifier:
+
+```swift
+.presentCustomerCenter(
+    isPresented: self.$presentingCustomerCenter,
+    customerCenterActionHandler: { action in
+        switch action {
+        case .restoreCompleted(let customerInfo):
+        case .restoreStarted:
+        case .restoreFailed(let error):
+        case .showingManageSubscriptions:
+        case .refundRequestStarted(let productId):
+        case .refundRequestCompleted(let status):
+        case .feedbackSurveyCompleted(let surveyOptionID):
+        }
+    }
+) {
+    self.presentingCustomerCenter = false
+}
+```
+
+### Release Notes
+
+### RevenueCatUI SDK
+#### Paywall Components
+##### 🐞 Bugfixes
+* Match text, image, and stack properties and behaviors from dashboard (#4261) via Josh Holtz (@joshdholtz)
+#### Customer Center
+##### 🐞 Bugfixes
+* More customer center docs and fix init (#4304) via Cesar de la Vega (@vegaro)
+* Remove background from FeedbackSurveyView (#4300) via Cesar de la Vega (@vegaro)
+
+#### 🔄 Other Changes
+* Fix iOS 15 tests (#4320) via Cesar de la Vega (@vegaro)
+* Generating new test snapshots for `main` - watchos (#4323) via RevenueCat Git Bot (@RCGitBot)
+* Generating new test snapshots for `main` - macos (#4322) via RevenueCat Git Bot (@RCGitBot)
+* Adds an `onDismiss` callback to `ErrorDisplay` (#4312) via JayShortway (@JayShortway)
+* Added previews for text component, image component, and paywall for template 1 (#4306) via Josh Holtz (@joshdholtz)
+* Remove `CUSTOMER_CENTER_ENABLED` (#4305) via Cesar de la Vega (@vegaro)
+* [Diagnostics] Refactor diagnostics track methods to handle background work automatically (#4270) via Toni Rico (@tonidero)
+* [Diagnostics] Add `apple_products_request` event (#4247) via Toni Rico (@tonidero)
+* Bump webrick from 1.7.0 to 1.8.2 in /Tests/InstallationTests/CocoapodsInstallation (#4313) via dependabot[bot] (@dependabot[bot])
+* Bump fastlane from 2.222.0 to 2.223.1 (#4309) via dependabot[bot] (@dependabot[bot])
+* Bump fastlane-plugin-revenuecat_internal from `55a0455` to `5b2e35c` (#4310) via dependabot[bot] (@dependabot[bot])
+
+## 5.4.0
+## RevenueCat SDK
+### ✨ New Features
+* Add `kochava` integration (#4274) via Toni Rico (@tonidero)
+
+## RevenueCatUI SDK
+### Customer Center
+#### 🐞 Bugfixes
+* Cleanup of strings in Customer Center (#4294) via Cesar de la Vega (@vegaro)
+
+### 🔄 Other Changes
+* [Diagnostics] Add `apple_purchase_attempt ` event (#4253) via Cesar de la Vega (@vegaro)
+* Temporarily set SWIFT_TREAT_WARNINGS_AS_ERRORS as NO (#4292) via Cesar de la Vega (@vegaro)
+
+## 5.3.4
+## RevenueCat SDK
+### 🐞 Bugfixes
+* Replace withCheckedThrowingContinuation Calls With withUnsafeThrowingContinuation (#4286) via Will Taylor (@fire-at-will)
+* Round price per period calculations to nearest 2-decimal (#4275) via Toni Rico (@tonidero)
+### 📦 Dependency Updates
+* Bump fastlane-plugin-revenuecat_internal from `5140dbc` to `55a0455` (#4277) via dependabot[bot] (@dependabot[bot])
+
+## RevenueCatUI SDK
+### 🐞 Bugfixes
+* [Paywalls] Use store product for `{{ sub_period }}` duration (#4273) via Josh Holtz (@joshdholtz)
+### Customer Center
+#### 🐞 Bugfixes
+* Stateobject instantiation fix (#4271) via James Borthwick (@jamesrb1)
+
+### 🔄 Other Changes
+* Update allowSharingAppStoreAccount deprecation message (#4272) via Will Taylor (@fire-at-will)
+* Update StoreKit Version Info in GitHub Issues Template (#4254) via Will Taylor (@fire-at-will)
+
+## 5.3.3
+### Bugfixes
+* Remove usage of adServicesToken in syncPurchases (#4257) via Mark Villacampa (@MarkVillacampa)
+* Fixes a Paywall Template 7 crash when none of the tiers have any available products. (#4243) via JayShortway (@JayShortway)
+* [SK2] send unsynced attributes when syncing purchases (#4245) via Mark Villacampa (@MarkVillacampa)
+### Other Changes
+* Do not embed `RevenueCat.framework` in `RevenueCatUI` (#4256) via Cesar de la Vega (@vegaro)
+* Add warnings and clarifications to v5 migration docs (#4231) via Mark Villacampa (@MarkVillacampa)
+* Fixes SwiftLint violation of rule optional_data_string_conversion (#4252) via JayShortway (@JayShortway)
+* Paywall Components Localized Strings (#4237) via James Borthwick (@jamesrb1)
+* Update `fastlane-plugin-revenuecat_internal` (#4244) via Cesar de la Vega (@vegaro)
+* Add missing `#if PAYWALL_COMPONENTS` (#4241) via James Borthwick (@jamesrb1)
+* Paywalls Components Viewmodels + partial localization support (#4230) via James Borthwick (@jamesrb1)
+
+## 5.3.2
+### Bugfixes
+* [Customer Center] Build `WrongPlatformView` from JSON (#4234) via Cesar de la Vega (@vegaro)
+* Add `feedbackSurveyCompleted` event to Customer Center events (#4194) via Cesar de la Vega (@vegaro)
+### Other Changes
+* [Diagnostics] Add `backend_error_code` property (#4236) via Toni Rico (@tonidero)
+* Update README.md (#3986) via Khoa (@onmyway133)
+
+## 5.3.1
+### Bugfixes
+* Fix `compatibleTopBarTrailing` in MacOS and api tests (#4226) via Cesar de la Vega (@vegaro)
+* [Paywall] Fix restoreStarted not being called on `presentPaywallIfNeeded` when using `requiredEntitlementIdentifier` (#4223) via Josh Holtz (@joshdholtz)
+* [CustomerCenter] Move sheet and restore alert creation to `ManageSubscriptionsView` (#4220) via Cesar de la Vega (@vegaro)
+* [EXTERNAL] `Custom Entitlements Computation`: fix support display on debug screen (#4215) by @NachoSoto (#4218) via Toni Rico (@tonidero)
+* [Customer Center] Add padding to `No thanks` in promotional offer screen (#4221) via Cesar de la Vega (@vegaro)
+* Fix version number in plist files (#4213) via Cesar de la Vega (@vegaro)
+* fix mac os sandbox check slowness (#3879) via Andy Boedo (@aboedo)
+* [Customer Center] Fix `FeedbackSurveyView` not opening (#4208) via Cesar de la Vega (@vegaro)
+* Remove `unneeded_override` disable to fix linter (#4209) via Cesar de la Vega (@vegaro)
+### Dependency Updates
+* Bump rexml from 3.3.3 to 3.3.6 in /Tests/InstallationTests/CocoapodsInstallation (#4210) via dependabot[bot] (@dependabot[bot])
+* Bump rexml from 3.3.3 to 3.3.6 (#4211) via dependabot[bot] (@dependabot[bot])
+### Other Changes
+* Update readme wording (#3914) via James Borthwick (@jamesrb1)
+* Set a maximum duration for iOS 15 tests (#4229) via Cesar de la Vega (@vegaro)
+* Paywall Components Initial Commit (#4224) via James Borthwick (@jamesrb1)
+* [CustomerCenter] Open App Store when the user wants to update their app (#4199) via JayShortway (@JayShortway)
+* [Customer Center] Shows a warning when the app is not the latest version (#4193) via JayShortway (@JayShortway)
+* Fix integration tests simulator version (#4219) via Cesar de la Vega (@vegaro)
+* Pin swift-docc-plugin to 1.3.0 (#4216) via James Borthwick (@jamesrb1)
+
+## 5.3.0
+### New Features
+* Price rounding logic (#4132) via James Borthwick (@jamesrb1)
+### Bugfixes
+* [Customer Center] Migrate to List style (#4190) via Cody Kerns (@codykerns)
+* [Paywalls] Improve locale consistency (#4158) via Josh Holtz (@joshdholtz)
+* Set Paywalls Tester deployment target to iOS 15 (#4196) via James Borthwick (@jamesrb1)
+* [Customer Center] Hide Contact Support button if URL can't be created (#4192) via Cesar de la Vega (@vegaro)
+* Fix the setting for SKIP_INSTALL in Xcode project (#4195) via Andy Boedo (@aboedo)
+* [Customer Center] Improving customer center buttons (#4165) via Cody Kerns (@codykerns)
+* Revert workaround for iOS 18 beta 5 SwiftUI crash (#4173) via Mark Villacampa (@MarkVillacampa)
+* [Paywalls] Make iOS version calculation lazy (#4163) via Mark Villacampa (@MarkVillacampa)
+* Observe `PurchaseHandler` when owned externally (#4097) via James Borthwick (@jamesrb1)
+### Dependency Updates
+* Bump fastlane-plugin-revenuecat_internal from `d5f0742` to `4c4b8ce` (#4167) via dependabot[bot] (@dependabot[bot])
+* Bump rexml from 3.2.8 to 3.3.3 in /Tests/InstallationTests/CocoapodsInstallation (#4176) via dependabot[bot] (@dependabot[bot])
+* Bump rexml from 3.2.9 to 3.3.3 (#4175) via dependabot[bot] (@dependabot[bot])
+### Other Changes
+* [Customer Center] Clean up colors in WrongPlatformView and NoSubscriptionsView (#4204) via Cesar de la Vega (@vegaro)
+* Fix failing `all-tests` and retry more flaky tests (#4188) via Josh Holtz (@joshdholtz)
+* Compatibility content unavailable improvements (#4197) via James Borthwick (@jamesrb1)
+* Create lane to enable customer center (#4191) via Cesar de la Vega (@vegaro)
+* XCFramework artifacts in CircleCI (#4189) via Andy Boedo (@aboedo)
+* [Customer Center] CustomerCenterViewModel checks whether the app is the latest version (#4169) via JayShortway (@JayShortway)
+* export RevenueCatUI xcframework (#4172) via Andy Boedo (@aboedo)
+* Corrects references from ManageSubscriptionsButtonStyle to ButtonsStyle.  (#4186) via JayShortway (@JayShortway)
+* Speed up carthage installation tests (#4184) via Andy Boedo (@aboedo)
+* Customer center improvements (#4166) via James Borthwick (@jamesrb1)
+* replace `color(from colorInformation:)` global with extension (#4183) via Andy Boedo (@aboedo)
+* Generating new test snapshots for `main` - ios-13 (#4181) via RevenueCat Git Bot (@RCGitBot)
+* Generating new test snapshots for `main` - ios-16 (#4182) via RevenueCat Git Bot (@RCGitBot)
+* Generating new test snapshots for `main` - ios-14 (#4180) via RevenueCat Git Bot (@RCGitBot)
+* Generating new test snapshots for `main` - ios-15 (#4179) via RevenueCat Git Bot (@RCGitBot)
+* Fix tests in main (#4174) via Andy Boedo (@aboedo)
+* Enable customer center tests (#4171) via James Borthwick (@jamesrb1)
+* [Customer Center] Initial implementation (#3967) via Cesar de la Vega (@vegaro)
+
 ## 5.2.2-customercenter.alpha.3
 
 - Fix for disabled promo offer button (#4142) 

@@ -13,8 +13,6 @@
 //  Created by Cesar de la Vega on 28/5/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import Foundation
 import RevenueCat
 import SwiftUI
@@ -54,12 +52,11 @@ struct ProminentButtonStyle: PrimitiveButtonStyle {
 struct DismissCircleButton: View {
 
     @Environment(\.localization) private var localization
-
-    var action: () -> Void
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         Button {
-            action()
+            self.dismiss()
         } label: {
             Circle()
                 .fill(Color(uiColor: .secondarySystemFill))
@@ -88,16 +85,12 @@ struct ButtonStyles_Previews: PreviewProvider {
             Button("Didn't receive purchase") {}
                 .buttonStyle(ProminentButtonStyle())
 
-            DismissCircleButton {
-
-            }
+            DismissCircleButton()
         }.padding()
             .environment(\.appearance, CustomerCenterConfigTestData.standardAppearance)
             .environment(\.localization, CustomerCenterConfigTestData.customerCenterData.localization)
     }
 
 }
-
-#endif
 
 #endif

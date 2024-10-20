@@ -15,7 +15,6 @@
 
 import SwiftUI
 
-#if CUSTOMER_CENTER_ENABLED
 #if os(iOS)
 
 /// A SwiftUI view for displaying a message about unavailable content
@@ -24,6 +23,7 @@ import SwiftUI
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 struct CompatibilityContentUnavailableView: View {
+
     let title: String
     let systemImage: String
     let description: Text?
@@ -82,5 +82,4 @@ struct CompatibilityContentUnavailableView: View {
     }
 }
 
-#endif
 #endif

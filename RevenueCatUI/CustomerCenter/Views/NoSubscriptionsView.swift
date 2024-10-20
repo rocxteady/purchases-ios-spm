@@ -13,8 +13,6 @@
 //  Created by Andrés Boedo on 5/3/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import RevenueCat
 import SwiftUI
 
@@ -26,12 +24,7 @@ import SwiftUI
 @available(watchOS, unavailable)
 struct NoSubscriptionsView: View {
 
-    // swiftlint:disable:next todo
-    // TODO: build screen using this configuration
     let configuration: CustomerCenterConfigData
-
-    @Environment(\.dismiss)
-    var dismiss
 
     @Environment(\.localization)
     private var localization: CustomerCenterConfigData.Localization
@@ -73,9 +66,7 @@ struct NoSubscriptionsView: View {
         }
         .toolbar {
             ToolbarItem(placement: .compatibleTopBarTrailing) {
-                DismissCircleButton {
-                    dismiss()
-                }
+                DismissCircleButton()
             }
         }
     }
@@ -95,8 +86,6 @@ struct NoSubscriptionsView_Previews: PreviewProvider {
     }
 
 }
-
-#endif
 
 #endif
 

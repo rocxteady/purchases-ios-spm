@@ -13,8 +13,6 @@
 //  Created by Cesar de la Vega on 27/5/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import Foundation
 import RevenueCat
 
@@ -146,6 +144,11 @@ import RevenueCat
             return .purchasesNotFound
         }
     }
+
+    func onAppUpdateClick() {
+        // swiftlint:disable:next todo
+        // TODO: implement opening the App Store
+    }
 }
 
 fileprivate extension String {
@@ -162,7 +165,5 @@ fileprivate extension String {
         }
     }
 }
-
-#endif
 
 #endif

@@ -13,13 +13,13 @@
 //  Created by Andrés Boedo on 5/3/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import RevenueCat
 import SwiftUI
 
 #if os(iOS)
 
+/// Warning: This is currently in beta and ubject to change.
+///
 /// A SwiftUI view for displaying a customer support common tasks
 @available(iOS 15.0, *)
 @available(macOS, unavailable)
@@ -28,29 +28,22 @@ import SwiftUI
 public struct CustomerCenterView: View {
 
     @StateObject private var viewModel: CustomerCenterViewModel
+    @State private var ignoreAppUpdateWarning: Bool = false
 
     @Environment(\.colorScheme)
     private var colorScheme
-    private var localization: CustomerCenterConfigData.Localization
-    private var appearance: CustomerCenterConfigData.Appearance
-    private var supportInformation: CustomerCenterConfigData.Support?
 
     /// Create a view to handle common customer support tasks
-    public init(customerCenterActionHandler: CustomerCenterActionHandler? = nil,
-                localization: CustomerCenterConfigData.Localization = .default,
-                appearance: CustomerCenterConfigData.Appearance = .default) {
+    /// - Parameters:
+    ///   - customerCenterActionHandler: An optional `CustomerCenterActionHandler` to handle actions
+    ///   from the customer center.
+    public init(customerCenterActionHandler: CustomerCenterActionHandler? = nil) {
         self._viewModel = .init(wrappedValue:
                                     CustomerCenterViewModel(customerCenterActionHandler: customerCenterActionHandler))
-        self.localization = localization
-        self.appearance = appearance
     }
 
-    fileprivate init(viewModel: CustomerCenterViewModel,
-                     localization: CustomerCenterConfigData.Localization = .default,
-                     appearance: CustomerCenterConfigData.Appearance = .default) {
+    fileprivate init(viewModel: CustomerCenterViewModel) {
         self._viewModel = .init(wrappedValue: viewModel)
-        self.localization = localization
-        self.appearance = appearance
     }
 
     // swiftlint:disable:next missing_docs
@@ -93,8 +86,19 @@ private extension CustomerCenterView {
         if viewModel.hasSubscriptions {
             if viewModel.subscriptionsAreFromApple,
                let screen = configuration.screens[.management] {
-                ManageSubscriptionsView(screen: screen,
-                                        customerCenterActionHandler: viewModel.customerCenterActionHandler)
+                if let productId = configuration.productId, !ignoreAppUpdateWarning && !viewModel.appIsLatestVersion {
+                    AppUpdateWarningView(
+                        productId: productId,
+                        onContinueAnywayClick: {
+                            withAnimation {
+                                ignoreAppUpdateWarning = true
+                            }
+                        }
+                    )
+                } else {
+                    ManageSubscriptionsView(screen: screen,
+                                            customerCenterActionHandler: viewModel.customerCenterActionHandler)
+                }
             } else {
                 WrongPlatformView()
             }
@@ -105,7 +109,8 @@ private extension CustomerCenterView {
 
     @ViewBuilder
     func destinationView(configuration: CustomerCenterConfigData) -> some View {
-        let accentColor = Color.from(colorInformation: self.appearance.accentColor, for: self.colorScheme)
+        let accentColor = Color.from(colorInformation: configuration.appearance.accentColor,
+                                     for: self.colorScheme)
 
         CompatibilityNavigationStack {
             destinationContent(configuration: configuration)
@@ -129,8 +134,6 @@ struct CustomerCenterView_Previews: PreviewProvider {
    }
 
 }
-
-#endif
 
 #endif
 

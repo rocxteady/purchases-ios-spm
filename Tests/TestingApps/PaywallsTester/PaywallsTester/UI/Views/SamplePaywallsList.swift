@@ -88,14 +88,47 @@ struct SamplePaywallsList: View {
                 )
             )
         case .customerCenter:
-            #if CUSTOMER_CENTER_ENABLED
-            CustomerCenterView()
-            #endif
+            CustomerCenterView(customerCenterActionHandler: self.handleCustomerCenterAction)
+        #if PAYWALL_COMPONENTS
+        case .componentPaywall(let data):
+            TemplateComponentsView(paywallComponentsData: data, offering: Self.loader.offeringWithDefaultPaywall())
+        #endif
         }
+
     }
 
     private func list(with loader: SamplePaywallLoader) -> some View {
         List {
+
+            #if PAYWALL_COMPONENTS
+            Section("Components") {
+                Button {
+                    let data = SamplePaywallLoader.template1Components
+                    data.componentsConfig.components.printAsJSON()
+                    data.componentsLocalizations.printAsJSON()
+                    self.display = .componentPaywall(data)
+                } label: {
+                    TemplateLabel(name: "Curiosity Components", icon: "iphone")
+                }
+                Button {
+                    let data = SamplePaywallLoader.fitnessComponents
+                    data.componentsConfig.components.printAsJSON()
+                    data.componentsLocalizations.printAsJSON()
+                    self.display = .componentPaywall(data)
+                } label: {
+                    TemplateLabel(name: "Fitness Components", icon: "iphone")
+                }
+                Button {
+                    let data = SamplePaywallLoader.simpleSampleComponents
+                    data.componentsConfig.components.printAsJSON()
+                    data.componentsLocalizations.printAsJSON()
+                    self.display = .componentPaywall(data)
+                } label: {
+                    TemplateLabel(name: "Simple Sample Components", icon: "iphone")
+                }
+            }
+            #endif
+
             ForEach(PaywallTemplate.allCases, id: \.rawValue) { template in
                 Section(template.name) {
                     ForEach(PaywallViewMode.allCases, id: \.self) { mode in
@@ -145,7 +178,6 @@ struct SamplePaywallsList: View {
                 }
             }
             
-            #if CUSTOMER_CENTER_ENABLED
             #if os(iOS)
             Section("Customer Center") {
                 Button {
@@ -161,16 +193,13 @@ struct SamplePaywallsList: View {
                 }
             }
             #endif
-            #endif
         }
         .frame(maxWidth: .infinity)
         .buttonStyle(.plain)
-        #if CUSTOMER_CENTER_ENABLED
         #if os(iOS)
         .presentCustomerCenter(isPresented: self.$presentingCustomerCenter, customerCenterActionHandler: self.handleCustomerCenterAction) {
             self.presentingCustomerCenter = false
         }
-        #endif
         #endif
     }
 
@@ -213,7 +242,6 @@ private struct TemplateLabel: View {
 
 // MARK: -
 
-#if CUSTOMER_CENTER_ENABLED
 #if os(iOS)
 
 extension SamplePaywallsList {
@@ -232,11 +260,12 @@ extension SamplePaywallsList {
             print("CustomerCenter: refundRequestStarted. ProductId: \(productId)")
         case .refundRequestCompleted(let status):
             print("CustomerCenter: refundRequestCompleted. Result: \(status)")
+        case .feedbackSurveyCompleted(let surveyOptionID):
+            print("CustomerCenter: feedbackSurveyCompleted. Result: \(surveyOptionID)")
         }
     }
 }
 
-#endif
 #endif
 
 private extension SamplePaywallsList {
@@ -250,6 +279,9 @@ private extension SamplePaywallsList {
         case missingPaywall
         case unrecognizedPaywall
         case customerCenter
+        #if PAYWALL_COMPONENTS
+        case componentPaywall(PaywallComponentsData)
+        #endif
 
     }
 
@@ -276,6 +308,10 @@ extension SamplePaywallsList.Display: Identifiable {
             
         case .customerCenter:
             return "customer-center"
+        #if PAYWALL_COMPONENTS
+        case .componentPaywall:
+            return "component-paywall"
+        #endif
         }
     }
 

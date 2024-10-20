@@ -13,8 +13,6 @@
 //  Created by Cesar de la Vega on 17/6/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import RevenueCat
 import StoreKit
 import SwiftUI
@@ -37,15 +35,18 @@ struct PromotionalOfferView: View {
     private var appearance: CustomerCenterConfigData.Appearance
     @Environment(\.colorScheme)
     private var colorScheme
+    @State private var isLoading: Bool = false
 
     init(promotionalOffer: PromotionalOffer,
          product: StoreProduct,
          promoOfferDetails: CustomerCenterConfigData.HelpPath.PromotionalOffer) {
-        let promotionalOfferData = PromotionalOfferData(promotionalOffer: promotionalOffer,
-                                                        product: product,
-                                                        promoOfferDetails: promoOfferDetails)
-        let viewModel = PromotionalOfferViewModel(promotionalOfferData: promotionalOfferData)
-        self._viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: PromotionalOfferViewModel(
+            promotionalOfferData: PromotionalOfferData(
+                promotionalOffer: promotionalOffer,
+                product: product,
+                promoOfferDetails: promoOfferDetails
+            )
+        ))
     }
 
     var body: some View {
@@ -60,12 +61,17 @@ struct PromotionalOfferView: View {
 
                     Spacer()
 
-                    PromoOfferButtonView(viewModel: self.viewModel, appearance: self.appearance)
+                    PromoOfferButtonView(isLoading: $isLoading,
+                                         viewModel: self.viewModel,
+                                         appearance: self.appearance)
 
-                    let dismissButtonTitle = self.localization.commonLocalizedString(for: .noThanks)
-                    Button(dismissButtonTitle) {
+                    Button {
                         dismiss()
+                    } label: {
+                        Text(self.localization.commonLocalizedString(for: .noThanks))
                     }
+                    .padding()
+                    .frame(maxWidth: .infinity)
                 } else {
                     EmptyView()
                         .onAppear {
@@ -114,6 +120,8 @@ struct PromotionalOfferHeaderView: View {
 @available(watchOS, unavailable)
 struct PromoOfferButtonView: View {
 
+    @Binding var isLoading: Bool
+
     @Environment(\.locale)
     private var locale
 
@@ -128,93 +136,38 @@ struct PromoOfferButtonView: View {
             let mainTitle = discount.localizedPricePerPeriodByPaymentMode(.current)
             let localizedProductPricePerPeriod = product.localizedPricePerPeriod(.current)
 
-            Button(action: {
-                Task {
-                    await viewModel.purchasePromo()
+            AsyncButton {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isLoading = true
                 }
-            }, label: {
-                VStack {
-                    Text(mainTitle)
-                        .font(.headline)
-
-                    let format = Localization.localizedBundle(self.locale)
-                        .localizedString(forKey: "then_price_per_period", value: "then %@", table: nil)
-
-                    Text(String(format: format, localizedProductPricePerPeriod))
-                        .font(.subheadline)
+                await viewModel.purchasePromo()
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isLoading = false
                 }
-            })
+            } label: {
+                if isLoading {
+                    TintedProgressView()
+                } else {
+                    VStack {
+                        Text(mainTitle)
+                            .font(.headline)
+
+                        let format = Localization.localizedBundle(self.locale)
+                            .localizedString(forKey: "then_price_per_period", value: "then %@", table: nil)
+
+                        Text(String(format: format, localizedProductPricePerPeriod))
+                            .font(.subheadline)
+                    }
+                }
+            }
             .buttonStyle(ProminentButtonStyle())
             .padding(.horizontal)
+            .disabled(isLoading)
+            .opacity(isLoading ? 0.5 : 1)
+            .animation(.easeInOut(duration: 0.3), value: isLoading)
         }
     }
 
 }
-
-private extension StoreProductDiscount {
-
-    func localizedPricePerPeriodByPaymentMode(_ locale: Locale) -> String {
-        let period = self.subscriptionPeriod.periodTitle()
-
-        switch self.paymentMode {
-        case .freeTrial:
-            // 3 months for free
-            return "\(period) for free"
-        case .payAsYouGo:
-            // $0.99/month for 3 months
-            return "\(localizedPricePerPeriod(locale)) for \(localizedNumberOfPeriods())"
-        case .payUpFront:
-            // 3 months for $0.99
-            return "\(period) for \(self.localizedPriceString)"
-        }
-    }
-
-    func localizedNumberOfPeriods() -> String {
-        let periodString = "\(self.numberOfPeriods) \(self.subscriptionPeriod.durationTitle)"
-        let pluralized = self.numberOfPeriods > 1 ?  periodString + "s" : periodString
-        return pluralized
-    }
-
-    func localizedPricePerPeriod(_ locale: Locale) -> String {
-        let unit = Localization.abbreviatedUnitLocalizedString(for: self.subscriptionPeriod, locale: locale)
-        return "\(self.localizedPriceString)/\(unit)"
-    }
-
-}
-
-private extension StoreProduct {
-
-    func localizedPricePerPeriod(_ locale: Locale) -> String {
-        guard let period = self.subscriptionPeriod else {
-            return self.localizedPriceString
-        }
-
-        let unit = Localization.abbreviatedUnitLocalizedString(for: period, locale: locale)
-        return "\(self.localizedPriceString)/\(unit)"
-    }
-
-}
-
-private extension SubscriptionPeriod {
-
-    var durationTitle: String {
-        switch self.unit {
-        case .day: return "day"
-        case .week: return "week"
-        case .month: return "month"
-        case .year: return "year"
-        default: return "Unknown"
-        }
-    }
-
-    func periodTitle() -> String {
-        let periodString = "\(self.value) \(self.durationTitle)"
-        let pluralized = self.value > 1 ?  periodString + "s" : periodString
-        return pluralized
-    }
-
-}
-
-#endif
 
 #endif

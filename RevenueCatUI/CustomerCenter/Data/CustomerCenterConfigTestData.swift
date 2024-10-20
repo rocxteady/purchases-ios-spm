@@ -13,8 +13,6 @@
 //  Created by Cesar de la Vega on 28/5/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import Foundation
 import RevenueCat
 
@@ -103,7 +101,8 @@ enum CustomerCenterConfigTestData {
                 ]
             ),
             support: .init(email: "test-support@revenuecat.com"),
-            lastPublishedAppVersion: lastPublishedAppVersion
+            lastPublishedAppVersion: lastPublishedAppVersion,
+            productId: 1
         )
     }
 
@@ -139,5 +138,3 @@ enum CustomerCenterConfigTestData {
     )
 
 }
-
-#endif

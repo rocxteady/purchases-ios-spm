@@ -56,6 +56,12 @@ public struct PaywallView: View {
 
     private var initializationError: NSError?
 
+    @Environment(\.onRequestedDismissal)
+    private var onRequestedDismissal: (() -> Void)?
+
+    @Environment(\.dismiss)
+    private var dismiss
+
     /// Create a view to display the paywall in `Offerings.current`.
     ///
     /// - Parameter fonts: An optional ``PaywallFontProvider``.
@@ -173,7 +179,13 @@ public struct PaywallView: View {
     // swiftlint:disable:next missing_docs
     public var body: some View {
         self.content
-            .displayError(self.$error, dismissOnClose: true)
+            .displayError(self.$error) {
+                guard let onRequestedDismissal = self.onRequestedDismissal else {
+                    self.dismiss()
+                    return
+                }
+                onRequestedDismissal()
+            }
     }
 
     @MainActor
@@ -219,6 +231,7 @@ public struct PaywallView: View {
     }
 
     @ViewBuilder
+    // swiftlint:disable:next function_body_length
     private func paywallView(
         for offering: Offering,
         activelySubscribedProductIdentifiers: Set<String>,
@@ -226,6 +239,40 @@ public struct PaywallView: View {
         checker: TrialOrIntroEligibilityChecker,
         purchaseHandler: PurchaseHandler
     ) -> some View {
+
+        #if PAYWALL_COMPONENTS
+        if let componentData = offering.paywallComponentsData {
+            TemplateComponentsView(paywallComponentsData: componentData, offering: offering)
+        } else {
+
+            let (paywall, displayedLocale, template, error) = offering.validatedPaywall(locale: self.locale)
+
+            let paywallView = LoadedOfferingPaywallView(
+                offering: offering,
+                activelySubscribedProductIdentifiers: activelySubscribedProductIdentifiers,
+                paywall: paywall,
+                template: template,
+                mode: self.mode,
+                fonts: fonts,
+                displayCloseButton: self.displayCloseButton,
+                introEligibility: checker,
+                purchaseHandler: purchaseHandler,
+                locale: displayedLocale
+            )
+
+            if let error {
+                DebugErrorView(
+                    "\(error.description)\n" +
+                    "You can fix this by editing the paywall in the RevenueCat dashboard.\n" +
+                    "The displayed paywall contains default configuration.\n" +
+                    "This error will be hidden in production.",
+                    replacement: paywallView
+                )
+            } else {
+                paywallView
+            }
+        }
+        #else
         let (paywall, displayedLocale, template, error) = offering.validatedPaywall(locale: self.locale)
 
         let paywallView = LoadedOfferingPaywallView(
@@ -252,6 +299,7 @@ public struct PaywallView: View {
         } else {
             paywallView
         }
+        #endif
     }
 
     // MARK: -

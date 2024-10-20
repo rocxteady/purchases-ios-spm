@@ -13,8 +13,6 @@
 //  Created by Cesar de la Vega on 17/6/24.
 //
 
-#if CUSTOMER_CENTER_ENABLED
-
 import Foundation
 import RevenueCat
 
@@ -36,22 +34,31 @@ class FeedbackSurveyViewModel: ObservableObject {
 
     private var purchasesProvider: CustomerCenterPurchasesType
     private let loadPromotionalOfferUseCase: LoadPromotionalOfferUseCaseType
+    private let customerCenterActionHandler: CustomerCenterActionHandler?
 
-    convenience init(feedbackSurveyData: FeedbackSurveyData) {
+    convenience init(feedbackSurveyData: FeedbackSurveyData,
+                     customerCenterActionHandler: CustomerCenterActionHandler?) {
         self.init(feedbackSurveyData: feedbackSurveyData,
                   purchasesProvider: CustomerCenterPurchases(),
-                  loadPromotionalOfferUseCase: LoadPromotionalOfferUseCase())
+                  loadPromotionalOfferUseCase: LoadPromotionalOfferUseCase(),
+                  customerCenterActionHandler: customerCenterActionHandler)
     }
 
     init(feedbackSurveyData: FeedbackSurveyData,
          purchasesProvider: CustomerCenterPurchasesType,
-         loadPromotionalOfferUseCase: LoadPromotionalOfferUseCaseType) {
+         loadPromotionalOfferUseCase: LoadPromotionalOfferUseCaseType,
+         customerCenterActionHandler: CustomerCenterActionHandler?) {
         self.feedbackSurveyData = feedbackSurveyData
         self.purchasesProvider = purchasesProvider
         self.loadPromotionalOfferUseCase = loadPromotionalOfferUseCase
+        self.customerCenterActionHandler = customerCenterActionHandler
     }
 
     func handleAction(for option: CustomerCenterConfigData.HelpPath.FeedbackSurvey.Option) async {
+        if let customerCenterActionHandler = self.customerCenterActionHandler {
+            customerCenterActionHandler(.feedbackSurveyCompleted(option.id))
+        }
+
         if let promotionalOffer = option.promotionalOffer,
            promotionalOffer.eligible {
             self.loadingState = option.id
@@ -74,7 +81,5 @@ class FeedbackSurveyViewModel: ObservableObject {
     }
 
 }
-
-#endif
 
 #endif
