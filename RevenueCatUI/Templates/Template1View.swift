@@ -97,7 +97,9 @@ struct Template1View: TemplateViewType {
         }
         .foregroundColor(self.configuration.colors.text1Color)
         .multilineTextAlignment(.center)
-        .edgesIgnoringSafeArea(.top)
+        .applyIf(self.configuration.headerImageURL != nil) { view  in
+            view.edgesIgnoringSafeArea(.top)
+        }
     }
 
     @ViewBuilder

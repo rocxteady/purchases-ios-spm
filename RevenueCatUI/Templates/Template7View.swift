@@ -160,7 +160,9 @@ struct Template7View: TemplateViewType {
 
             self.footerView
         }
-        .edgesIgnoringSafeArea(.top)
+        .applyIf(self.configuration.headerImageURL != nil) { view  in
+            view.edgesIgnoringSafeArea(.top)
+        }
     }
 
     @ViewBuilder
