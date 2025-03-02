@@ -357,8 +357,12 @@ fileprivate extension PaywallsV2View {
             return .init(locale: Locale.current, localizedStrings: PaywallComponent.LocalizationDictionary())
         }
 
+        //TODO: Remove tr locale check when we have tr_TR locale
         // STEP 1: Get available paywall locales
-        let paywallLocales = componentsLocalizations.keys.map { Locale(identifier: $0) }
+        let paywallLocales = componentsLocalizations.keys.map {
+            let identifier = $0 == "tr" ? "tr_TR" : $0
+            return Locale(identifier: identifier)
+        }
 
         // use default locale as a fallback if none of the user's preferred locales are not available in the paywall
         let defaultLocale = Locale(identifier: defaultLocale)
