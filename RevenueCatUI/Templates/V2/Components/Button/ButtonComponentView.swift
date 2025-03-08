@@ -102,6 +102,7 @@ struct ButtonComponentView: View {
             Logger.debug(Strings.restored_purchases)
             self.purchaseHandler.setRestored(customerInfo)
         } else {
+            self.purchaseHandler.setRestored(customerInfo)
             Logger.debug(Strings.restore_purchases_with_empty_result)
         }
     }
