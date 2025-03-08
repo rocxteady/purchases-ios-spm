@@ -210,6 +210,7 @@ private struct RestorePurchasesButton: View {
                 self.restoredCustomerInfo = customerInfo
                 self.showRestoredCustomerInfoAlert = true
             } else {
+                self.purchaseHandler.setRestored(customerInfo)
                 Logger.debug(Strings.restore_purchases_with_empty_result)
             }
         } label: {
